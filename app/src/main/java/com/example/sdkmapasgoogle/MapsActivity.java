@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -23,6 +25,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -91,6 +97,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 em um endereço
                 */
 
+                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+                try {
+                    //List<Address> listaEndereco = geocoder.getFromLocation(latitude, longitude, 1);
+
+                   String stringEndereco = "R. Benjamin Constant,\n" +
+                           "                        1648 - Asilo, Blumenau - SC, 89037-500, Brasil";
+
+                    List<Address> listaEndereco = geocoder.getFromLocationName
+                            (stringEndereco,1);
+
+                    if (listaEndereco != null && listaEndereco.size()>0){
+                        Address endereco = listaEndereco.get(0);
+                        /*
+                        Address[addressLines=[0:"R. Benjamin Constant,
+                        1648 - Asilo, Blumenau - SC, 89037-500, Brasil"],
+                        feature=1648,
+                        admin=Santa Catarina,
+                        sub-admin=Blumenau,
+                        locality=null,
+                        thoroughfare=Rua Benjamin Constant,
+                        postalCode=89037-500,
+                        countryCode=BR,
+                        countryName=Brasil,
+                        hasLatitude=true,
+                        latitude=-26.9009923,
+                        hasLongitude=true,
+                        longitude=-49.0980639,
+                        phone=null,
+                        url=null,
+                        extras=null]
+                        */
+
+                        Log.d("Local ", "onLocationChanged: " + endereco.toString());
+                        //Log.d("Local ", "onLocationChanged: " + endereco.getAddressLine(0));
+
+                    }
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
             }
 
             @Override
@@ -112,8 +162,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
-                    0,
-                    0,
+                    10000,
+                    10,
                     locationListener
             );
 
@@ -160,7 +210,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     locationManager.requestLocationUpdates(
                             LocationManager.GPS_PROVIDER,
                             10000,
-                            1,
+                            10,
                             locationListener
                     );
 
